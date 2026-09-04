@@ -413,7 +413,7 @@ func fixGameOptions(options *Options) *Options {
 // Checks game options sanity
 func areGameOptionsValid(options *Options) (bool, string) {
 	// Validate that the variant name is valid
-	if _, ok := variants[options.VariantName]; !ok {
+	if v := VariantFromOptions(options); v == nil {
 		msg := "\"" + options.VariantName + "\" is not a valid variant."
 		return false, msg
 	}

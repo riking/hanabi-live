@@ -53,7 +53,7 @@ func httpMissingScores(c *gin.Context) {
 	variantsEfficiencies := make([]float64, 0)
 	if numPlayers >= 2 && numPlayers <= 6 {
 		for _, v := range variantStatsList {
-			variant := variants[v.Name]
+			variant := variants[v.Name]  // TODO custom variants
 			variantsEfficiencies = append(variantsEfficiencies, variant.CalculateEfficiency(numPlayers))
 		}
 	}

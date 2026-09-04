@@ -113,7 +113,7 @@ func httpExport(c *gin.Context) {
 	// Make a deck and shuffle it
 	g := &Game{ // nolint: exhaustivestruct
 		Options:      options,
-		Variant:      variants[options.VariantName],
+		Variant:      VariantFromOptions(options),
 		ExtraOptions: &ExtraOptions{},
 		Seed:         seed,
 	}

@@ -45,21 +45,19 @@ func commandTableSetVariant(ctx context.Context, s *Session, d *CommandData) {
 		return
 	}
 
-	if _, ok := variants[d.Options.VariantName]; !ok {
+	variant := VariantFromOptions(d.Options)
+	if variant == nil {
 		s.Warning("The variant of \"" + d.Options.VariantName + "\" does not exist.")
 		return
 	}
 
-	tableSetVariant(ctx, s, d, t)
+	tableSetVariant(ctx, s, d, t, variant)
 }
 
-func tableSetVariant(ctx context.Context, s *Session, d *CommandData, t *Table) {
-	// Local variables
-	variant := variants[d.Options.VariantName]
-
+func tableSetVariant(ctx context.Context, s *Session, d *CommandData, t *Table, variant *Variant) {
 	// First, change the variant (do this before releasing the lock so that any concurrent
 	// commandTableJoin will fetch stats for the new variant automatically).
-	t.Options.VariantName = d.Options.VariantName
+	t.Options.VariantName = variant.Name
 
 	// Snapshot each player's userID and numGames before releasing t.Lock.
 	// models.UserStats.Get issues a DB query; holding t.Lock during that call can exhaust

@@ -31,6 +31,24 @@ type Variant struct {
 	MaxScore                 int
 }
 
+// Retrieves or constructs the Variant for the given table options.
+func VariantFromOptions(op *Options) *Variant {
+	return variants[op.VariantName]
+}
+
+// Retrieves or constructs the Variant for the given custom replay JSON options, if valid.
+func VariantFromOptionsJSON(op *OptionsJSON) (*Variant) {
+	if op.Variant == nil {
+		// default to No Variant
+		return variants[DefaultVariantName], nil
+	}
+	v, ok := variants[op.Variant]
+	if !ok {
+		return nil
+	}
+	return v
+}
+
 func (v *Variant) IsAlternatingClues() bool {
 	return strings.HasPrefix(v.Name, "Alternating Clues")
 }
@@ -69,6 +87,13 @@ func (v *Variant) IsScarceOnes() bool {
 
 func (v *Variant) IsSudoku() bool {
 	return strings.HasPrefix(v.Name, "Sudoku")
+}
+
+func (v *Variant) Equal(other *Variant) bool {
+	if other == nil {
+		return v == nil
+	}
+	return v.ID == other.ID
 }
 
 func (v *Variant) HasReversedSuits() bool {

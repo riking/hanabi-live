@@ -51,7 +51,7 @@ func (*Games) InsertTx(tx pgx.Tx, gameRow GameRow) (int, error) {
 
 func insertGame(queryer gameRowQuerier, gameRow GameRow) (int, error) {
 	// Local variables
-	variant := variants[gameRow.Options.VariantName]
+	variant := VariantFromOptions(gameRow.Options)
 
 	// https://www.postgresql.org/docs/9.5/dml-returning.html
 	// https://github.com/jackc/pgx/issues/411

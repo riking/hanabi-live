@@ -50,11 +50,14 @@ func commandTableJoin(ctx context.Context, s *Session, d *CommandData) {
 		}
 
 		passwordHash := t.PasswordHash
-		variantName := t.Options.VariantName
+		variant := VariantFromOptions(t.Options)
 		t.Unlock(ctx)
 		tableLocked = false
 
 		if !validateTableJoinPassword(s, d, passwordHash) {
+			return
+		}
+		if variant == nil {
 			return
 		}
 
@@ -67,7 +70,6 @@ func commandTableJoin(ctx context.Context, s *Session, d *CommandData) {
 		}
 
 		for {
-			variant := variants[variantName]
 			variantStats, err := models.UserStats.Get(s.UserID, variant.ID)
 			if err != nil {
 				logger.Error("Failed to pre-fetch variant stats for player \"" + s.Username +
@@ -89,12 +91,13 @@ func commandTableJoin(ctx context.Context, s *Session, d *CommandData) {
 
 			// The table owner can change the variant while the database queries are running.
 			// Repeat the variant query until the fetched stats match the locked table state.
-			if t.Options.VariantName == variantName {
+			variantAfter := VariantFromOptions(t.Options)
+			if variant.Equal(variantAfter) {
 				d.PregameStats = &PregameStats{NumGames: numGames, Variant: variantStats}
 				break
 			}
 
-			variantName = t.Options.VariantName
+			variant = variantAfter
 			t.Unlock(ctx)
 			tableLocked = false
 		}

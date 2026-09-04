@@ -250,6 +250,7 @@ func preFetchTableRestartData(
 ) (string, *PregameStats, bool) {
 	var precomputedSeed string
 	if restartData.precomputeSeed {
+		// TODO extended variants
 		variant := variants[restartData.variantName]
 		seedPrefix := "p" + strconv.Itoa(len(restartData.players)) +
 			"v" + strconv.Itoa(variant.ID) +
@@ -265,6 +266,7 @@ func preFetchTableRestartData(
 
 	// Pre-fetch the creator's pregame stats for when they join the new table via
 	// commandTableCreate → tableCreate → commandTableJoin → tableJoin.
+	// TODO extended variants
 	variant := variants[restartData.variantName]
 	var creatorNumGames int
 	if v, err := models.Games.GetUserNumGames(s.UserID, false); err != nil {

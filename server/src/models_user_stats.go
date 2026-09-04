@@ -307,7 +307,7 @@ func (us *UserStats) UpdateAll(highestVariantID int) error {
 			stats := NewUserStatsRow()
 			totalScore := 0
 			for _, gameHistory := range gameHistoryList {
-				variant := variants[gameHistory.Options.VariantName]
+				variant := VariantFromOptions(gameHistory.Options)
 				if variant.ID != variantID {
 					continue
 				}

@@ -118,11 +118,10 @@ func commandTableCreate(ctx context.Context, s *Session, d *CommandData) {
 	// If PregameStats is already set (e.g. called from tableRestart which pre-fetched before
 	// acquiring its own locks), skip this to avoid a redundant DB round-trip.
 	if d.PregameStats == nil {
-		variantName := d.Options.VariantName
+		variant := VariantFromOptions(d.Options)
 		if data.SetReplay {
-			variantName = d.PreFetchedReplay.Options.VariantName
+			variant = VariantFromOptions(d.PreFetchedReplay.Options)
 		}
-		variant := variants[variantName]
 		var numGames int
 		if v, err := models.Games.GetUserNumGames(s.UserID, false); err != nil {
 			logger.Error("Failed to pre-fetch game count for \"" + s.Username + "\": " + err.Error())

@@ -88,7 +88,7 @@ type Game struct {
 }
 
 func NewGame(t *Table) *Game {
-	variant := variants[t.Options.VariantName]
+	variant := VariantFromOptions(t.Options)
 
 	g := &Game{
 		DatetimeStarted:  time.Time{},

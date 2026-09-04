@@ -254,12 +254,10 @@ func isJSONValid(d *CommandData) (bool, string) {
 	}
 
 	// Validate that the specified variant exists
-	var variant *Variant
-	if v, ok := variants[*d.GameJSON.Options.Variant]; !ok {
+	var variant *Variant = VariantFromOptionsJSON(d.GameJSON.Options)
+	if variant == nil {
 		msg := "\"" + *d.GameJSON.Options.Variant + "\" is not a valid variant."
 		return false, msg
-	} else {
-		variant = v
 	}
 
 	// Validate that there is at least one action
@@ -490,9 +488,10 @@ func loadJSONOptionsToTable(d *CommandData, t *Table) {
 	if d.GameJSON.Options.StartingPlayer != nil {
 		startingPlayer = *d.GameJSON.Options.StartingPlayer
 	}
-	variantName := DefaultVariantName
-	if d.GameJSON.Options.Variant != nil {
-		variantName = *d.GameJSON.Options.Variant
+	// (the variant was already validated in the "validateJSON()" function)
+	variant := VariantFromOptionsJSON(d.GameJSON)
+	if variant == nil {
+		variant = variants[DefaultVariantName]
 	}
 	timed := false
 	if d.GameJSON.Options.Timed != nil {
@@ -540,12 +539,11 @@ func loadJSONOptionsToTable(d *CommandData, t *Table) {
 	}
 
 	// Store the options on the table
-	// (the variant was already validated in the "validateJSON()" function)
 	t.Options = &Options{
 		NumPlayers:            len(d.GameJSON.Players),
 		StartingPlayer:        startingPlayer,
-		VariantID:             variants[variantName].ID,
-		VariantName:           variantName,
+		VariantID:             variant.ID,
+		VariantName:           variant.Name,
 		Timed:                 timed,
 		TimeBase:              timeBase,
 		TimePerTurn:           timePerTurn,
@@ -618,7 +616,7 @@ func preFetchReplayData(s *Session, d *CommandData) bool {
 		return false
 	}
 
-	variant := variants[prefetched.Options.VariantName]
+	variant := VariantFromOptions(prefetched.Options)
 	noteSize := variant.GetDeckSize() + len(variant.Suits)
 	notes, err := models.Games.GetNotes(dbID, prefetched.Options.NumPlayers, noteSize)
 	if err != nil {

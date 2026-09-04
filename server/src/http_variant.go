@@ -143,7 +143,7 @@ func httpVariant(c *gin.Context) {
 		AverageScore:       averageScore,
 		NumMaxScores:       variantStats.NumMaxScores,
 		MaxScoreRate:       maxScoreRate,
-		MaxScore:           variants[variantName].MaxScore,
+		MaxScore:           variants[variantName].MaxScore,  // TODO only use of variant object?
 		NumStrikeouts:      variantStats.NumStrikeouts,
 		StrikeoutRate:      strikeoutRate,
 		VariantID:          variantID,

@@ -42,12 +42,12 @@ func commandTableStart(ctx context.Context, s *Session, d *CommandData) {
 			s.Error(StartGameFail)
 			return
 		}
+		variant := VariantFromOptions(t.Options)
 		for {
-			variantName := t.Options.VariantName
 			players := make([]*Player, len(t.Players))
 			copy(players, t.Players)
 			seedPrefix := "p" + strconv.Itoa(len(players)) +
-				"v" + strconv.Itoa(variants[variantName].ID) +
+				"v" + strconv.Itoa(variant.ID) +
 				"s"
 
 			t.Unlock(ctx)
@@ -62,10 +62,12 @@ func commandTableStart(ctx context.Context, s *Session, d *CommandData) {
 			if !validateTableStart(s, d, t) {
 				return
 			}
-			if variantName == t.Options.VariantName && sameTablePlayers(players, t.Players) {
+			variantAfter := VariantFromOptions(t.Options)
+			if variant.Equal(variantAfter) && sameTablePlayers(players, t.Players) {
 				precomputedSeed = seed
 				break
 			}
+			variant = variantAfter
 		}
 	}
 
@@ -155,9 +157,6 @@ func sameTablePlayers(first []*Player, second []*Player) bool {
 }
 
 func tableStart(ctx context.Context, s *Session, d *CommandData, t *Table, precomputedSeed string) {
-	// Local variables
-	variant := variants[t.Options.VariantName]
-
 	logger.Info(t.GetName() + "Starting the game.")
 
 	// Record the number of players
@@ -183,7 +182,7 @@ func tableStart(ctx context.Context, s *Session, d *CommandData, t *Table, preco
 	shuffleDeck := true
 	shufflePlayers := true
 	seedPrefix := "p" + strconv.Itoa(len(t.Players)) +
-		"v" + strconv.Itoa(variant.ID) +
+		"v" + strconv.Itoa(g.Variant.ID) +
 		"s" // e.g. "p2v0s" for a 2-player no variant game
 	if t.ExtraOptions.JSONReplay {
 		// This is a replay from arbitrary JSON data (or a custom game from arbitrary JSON data)
